@@ -7,18 +7,15 @@ datasource db {
   url      = env("DATABASE_URL") // Lê a string de conexão do arquivo .env
 }
 
-
-// schema de usuários e posts copiados do notion
+// Schema de usuário inicial sem conexão com outras tabelas (Lojas, reviews...)
+// pois ainda não foram criadas.
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  posts Post[]
-}
-
-model Post {
-  id       Int     @id @default(autoincrement())
-  title    String
-  content  String
-  author   User    @relation(fields: [authorId], references: [id])
-  authorId Int
+  id              Int      @id @default(autoincrement())
+  username        String   @unique
+  nome            String
+  email           String   @unique
+  senha_hash      String
+  foto_perfil_url String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 }
