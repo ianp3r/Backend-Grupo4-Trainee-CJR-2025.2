@@ -23,7 +23,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  senha: string;
+  password: string;
 
   @IsOptional()
   @IsString()
