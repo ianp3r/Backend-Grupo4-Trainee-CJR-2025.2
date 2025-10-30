@@ -37,14 +37,14 @@ export class UserService {
    * Faz o hash da senha antes de salvar.
    */
   async create(createUserDto: CreateUserDto): Promise<SafeUser> {
-    const { password } = createUserDto;
+    const { password, ...restoDoDto } = createUserDto;
 
     const senha_hash = await bcrypt.hash(password, this.saltRounds);
 
     try {
       const newUser = await this.prisma.user.create({
         data: {
-          ...createUserDto,
+          ...restoDoDto,
           senha_hash, // Substitui a senha pura pelo hash
         },
         select: userSelectSafeData, // Usa nosso 'select' padrão
