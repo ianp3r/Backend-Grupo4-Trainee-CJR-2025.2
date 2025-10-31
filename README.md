@@ -89,10 +89,34 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Local integration (frontend + backend)
+
+This project contains a NestJS backend and a Next.js frontend (kept in a sibling folder). The repository is set up for local development where the frontend runs on port 3000 and the backend runs on port 4000.
+
+Quick steps to run locally:
+
+1. Backend
+
+```powershell
+# from Backend-Grupo4-Trainee-CJR-2025.2
+$env:PORT = "4000"; $env:FRONTEND_URL = "http://localhost:3000"; npm run start:dev
+```
+
+2. Frontend
+
+```powershell
+# from Frontend-Grupo4-Trainee-CJR-2025.2
+$env:NEXT_PUBLIC_API_URL = "http://localhost:4000"; npm run dev
+```
+
+Notes:
+- `src/main.ts` enables CORS using the `FRONTEND_URL` env variable.
+- The Next.js `next.config.ts` has a rewrite so that requests to `/api/*` are proxied to the backend in dev (uses `NEXT_PUBLIC_API_URL`). This allows the frontend to call `/api/` without hitting CORS during development.
+- Example env files are provided as `.env.example` in both backend and frontend folders.
+
+Authentication & cookies:
+- If you use cookies for auth, ensure `credentials: 'include'` on fetch and that the backend sets cookies with correct `SameSite` and `Secure` attributes for your environment.

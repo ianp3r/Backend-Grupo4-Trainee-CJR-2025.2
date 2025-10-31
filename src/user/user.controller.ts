@@ -18,6 +18,15 @@ export class UserController {
   constructor(private readonly userService: UserService) { }
 
   /**
+   * Endpoint para login de usuário
+   * POST /users/login
+   */
+  @Post('login')
+  async login(@Body() loginDto: { email: string; password: string }): Promise<SafeUser> {
+    return this.userService.validateCredentials(loginDto.email, loginDto.password);
+  }
+
+  /**
    * endpoint para criação de usuario
    * POST /usuarios
    */
