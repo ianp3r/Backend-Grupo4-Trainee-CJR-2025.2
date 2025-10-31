@@ -148,4 +148,25 @@ export class UserService {
       throw error;
     }
   }
+
+  /**
+   * Valida as credenciais do usuário e retorna o usuário se válido
+   */
+  async validateCredentials(email: string, password: string): Promise<SafeUser> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.senha_hash);
+    if (!isPasswordValid) {
+      throw new NotFoundException('Credenciais inválidas');
+    }
+
+    const { senha_hash, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
 }
