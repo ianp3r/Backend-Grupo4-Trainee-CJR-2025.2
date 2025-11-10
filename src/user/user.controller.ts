@@ -1,44 +1,35 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService, SafeUser } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 // http://localhost:3000/users
 @Controller('users')
+@UseGuards(JwtAuthGuard) // <-- PROTEGE TODOS OS ENDPOINTS DO CONTROLLER
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
-  /**
-   * Endpoint para login de usuário
-   * POST /users/login
-   */
-  @Post('login')
-  async login(@Body() loginDto: { email: string; password: string }): Promise<SafeUser> {
-    return this.userService.validateCredentials(loginDto.email, loginDto.password);
-  }
+  //
+  // O ENDPOINT POST /users/login FOI REMOVIDO DAQUI
+  //
 
-  /**
-   * endpoint para criação de usuario
-   * POST /usuarios
-   */
-  @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<SafeUser> {
-    // O @Body() junto com o ValidationPipe (global) valida o DTO automaticamente
-    return this.userService.create(createUserDto);
-  }
+  //
+  // O ENDPOINT POST /users (create) FOI REMOVIDO DAQUI
+  // O registro agora é feito via POST /auth/register
+  //
 
   /**
    * endpoint para listar todos os usuarios
-   * GET /usuarios
+   * GET /users
    */
   @Get()
   findAll(): Promise<SafeUser[]> {
@@ -47,18 +38,16 @@ export class UserController {
 
   /**
    * endpoint para buscar um usuario pelo id
-   * GET /usuarios/:id
+   * GET /users/:id
    */
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<SafeUser> {
-    // O 'ParseIntPipe' garante que o 'id' na URL é um número válido.
-    // Se não for (ex: /usuarios/abc), ele retorna um erro 400.
     return this.userService.findOne(id);
   }
 
   /**
    * endpoint para atualizar um usuario pelo id
-   * PATCH /usuarios/:id
+   * PATCH /users/:id
    */
   @Patch(':id')
   update(
@@ -70,7 +59,7 @@ export class UserController {
 
   /**
    * endpoint para deletar um usuario pelo id
-   * DELETE /usuarios/:id
+   * DELETE /users/:id
    */
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): Promise<SafeUser> {
