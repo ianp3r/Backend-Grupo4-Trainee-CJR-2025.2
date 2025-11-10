@@ -3,17 +3,15 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service'; // Nosso serviço de BD
-import { CreateUserDto } from './dto/create-user.dto';
+import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-// Tipo 'SafeUser' omite a senha, usaremos como retorno padrão
-// por segurança.
+// Tipo 'SafeUser' omite a senha
 export type SafeUser = Omit<User, 'senha_hash'>;
 
-// Para não repetir o 'select' em todas as queries, o definimos como uma constante.
+// 'select' constante para não vazar a senha
 const userSelectSafeData: Prisma.UserSelect = {
   id: true,
   username: true,
@@ -24,40 +22,40 @@ const userSelectSafeData: Prisma.UserSelect = {
   updated_at: true,
 };
 
+// Este DTO agora é "interno", usado pelo AuthService
+// Ele não espera 'password', mas sim 'senha_hash'
+type InternalCreateUserDto = Omit<
+  import('./dto/create-user.dto').CreateUserDto,
+  'password'
+> & {
+  senha_hash: string;
+};
+
 @Injectable()
 export class UserService {
-  // Custo do processamento do hash
   private readonly saltRounds = 10;
 
   constructor(private prisma: PrismaService) { }
 
-
   /**
-   * Cria um novo usuário no banco de dados.
-   * Faz o hash da senha antes de salvar.
+   * Cria um novo usuário.
+   * NÃO faz mais hash. Recebe o hash pronto do AuthService.
    */
-  async create(createUserDto: CreateUserDto): Promise<SafeUser> {
-    const { password, ...restoDoDto } = createUserDto;
-
-    const senha_hash = await bcrypt.hash(password, this.saltRounds);
-
+  async create(data: InternalCreateUserDto): Promise<SafeUser> {
     try {
       const newUser = await this.prisma.user.create({
-        data: {
-          ...restoDoDto,
-          senha_hash, // Substitui a senha pura pelo hash
-        },
-        select: userSelectSafeData, // Usa nosso 'select' padrão
+        data: data, // Salva o DTO diretamente (já contém senha_hash)
+        select: userSelectSafeData,
       });
 
       return newUser;
     } catch (error) {
-      // Trata erros conhecidos do Prisma
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        // Código P2002: Violação de constraint 'unique' (email ou username já existe)
         if (error.code === 'P2002') {
           const target = error.meta?.target as string[];
-          throw new ConflictException(`O campo ${target.join(', ')} já está em uso.`);
+          throw new ConflictException(
+            `O campo ${target.join(', ')} já está em uso.`,
+          );
         }
       }
       throw error;
@@ -66,7 +64,6 @@ export class UserService {
 
   /**
    * Retorna uma lista de todos os usuários.
-   * A senha é omitida usando o 'select'.
    */
   async findAll(): Promise<SafeUser[]> {
     return this.prisma.user.findMany({
@@ -76,7 +73,6 @@ export class UserService {
 
   /**
    * Busca um usuário específico pelo ID.
-   * Retorna 404 se não for encontrado.
    */
   async findOne(id: number): Promise<SafeUser> {
     const user = await this.prisma.user.findUnique({
@@ -91,12 +87,13 @@ export class UserService {
     return user;
   }
 
-
+  /**
+   * Atualiza um usuário.
+   * Este método AINDA faz hash, pois um usuário pode
+   * atualizar sua própria senha.
+   */
   async update(id: number, updateUserDto: UpdateUserDto): Promise<SafeUser> {
-
-    // Desestrutura o DTO para a senha em plaintext fique separada
     const { password, ...restoDoDto } = updateUserDto;
-
     const data: Prisma.UserUpdateInput = { ...restoDoDto };
 
     if (password) {
@@ -110,6 +107,7 @@ export class UserService {
         select: userSelectSafeData,
       });
     } catch (error) {
+      // ... (código de tratamento de erro P2025 e P2002)
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         // Código P2025: O registro a ser atualizado não existe.
         if (error.code === 'P2025') {
@@ -118,27 +116,26 @@ export class UserService {
         // Código P2002: Conflito de campo 'unique'
         if (error.code === 'P2002') {
           const target = error.meta?.target as string[];
-          throw new ConflictException(`O campo ${target.join(', ')} já está em uso.`);
+          throw new ConflictException(
+            `O campo ${target.join(', ')} já está em uso.`,
+          );
         }
       }
       throw error;
     }
   }
 
-
-
-
   /**
    * Remove um usuário do banco de dados pelo ID.
    */
   async remove(id: number): Promise<SafeUser> {
     try {
-      // retorna o usuário deletado
       return await this.prisma.user.delete({
         where: { id },
         select: userSelectSafeData,
       });
     } catch (error) {
+      // ... (código de tratamento de erro P2025)
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         // Código P2025: O registro a ser deletado não existe.
         if (error.code === 'P2025') {
@@ -149,24 +146,8 @@ export class UserService {
     }
   }
 
-  /**
-   * Valida as credenciais do usuário e retorna o usuário se válido
-   */
-  async validateCredentials(email: string, password: string): Promise<SafeUser> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.senha_hash);
-    if (!isPasswordValid) {
-      throw new NotFoundException('Credenciais inválidas');
-    }
-
-    const { senha_hash, ...userWithoutPassword } = user;
-    return userWithoutPassword;
-  }
+  //
+  // O MÉTODO validateCredentials FOI REMOVIDO DAQUI
+  // A lógica agora está em AuthService.validateUser
+  //
 }
