@@ -19,3 +19,18 @@ model User {
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 }
+
+model Store {
+  id          Int      @id @default(autoincrement())
+  usuario_id  Int
+  nome        String
+  descricao   String?
+  logo_url    String?
+  banner_url  String?
+  sticker_url String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("lojas")
+}
+
