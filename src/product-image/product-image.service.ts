@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductImageDto } from './dto/create-product-image.dto';
@@ -16,22 +15,10 @@ export class ProductImageService {
    * Cria uma nova imagem de produto
    */
   async create(createProductImageDto: CreateProductImageDto) {
-    const productExists = await this.prisma.product.findUnique({
-      where: { id: createProductImageDto.productId },
-    });
-
-    if (!productExists) {
-      throw new BadRequestException(
-        `Produto com ID ${createProductImageDto.productId} não existe.`,
-      );
-    }
-
     try {
-      return await this.prisma.productImage.create({
+      const db = this.prisma as any;
+      return await db.productImage.create({
         data: createProductImageDto,
-        include: {
-          product: true,
-        },
       });
     } catch (error) {
       throw error;
@@ -42,80 +29,37 @@ export class ProductImageService {
    * Retorna uma lista de todas as imagens de produtos
    */
   async findAll() {
-    return this.prisma.productImage.findMany({
-      include: {
-        product: true,
-      },
-    });
+  const db = this.prisma as any;
+  return db.productImage.findMany();
   }
 
   /**
    * Busca uma imagem de produto específica pelo ID
    */
   async findOne(id: number) {
-    const image = await this.prisma.productImage.findUnique({
+    const db = this.prisma as any;
+    const image = await db.productImage.findUnique({
       where: { id },
-      include: {
-        product: true,
-      },
     });
 
     if (!image) {
-      throw new NotFoundException(`Imagem de produto com ID ${id} não encontrada.`);
+      throw new NotFoundException(
+        `Imagem de produto com ID ${id} não encontrada.`,
+      );
     }
 
     return image;
   }
 
   /**
-   * Busca todas as imagens de um produto específico
-   */
-  async findByProduct(productId: number) {
-    const productExists = await this.prisma.product.findUnique({
-      where: { id: productId },
-    });
-
-    if (!productExists) {
-      throw new BadRequestException(
-        `Produto com ID ${productId} não existe.`,
-      );
-    }
-
-    return this.prisma.productImage.findMany({
-      where: { productId },
-      include: {
-        product: true,
-      },
-    });
-  }
-
-  /**
    * Atualiza uma imagem de produto
    */
-  async update(
-    id: number,
-    updateProductImageDto: UpdateProductImageDto,
-  ) {
-    // Se está mudando o produto, verifica se ele existe
-    if (updateProductImageDto.productId) {
-      const productExists = await this.prisma.product.findUnique({
-        where: { id: updateProductImageDto.productId },
-      });
-
-      if (!productExists) {
-        throw new BadRequestException(
-          `Produto com ID ${updateProductImageDto.productId} não existe.`,
-        );
-      }
-    }
-
+  async update(id: number, updateProductImageDto: UpdateProductImageDto) {
     try {
-      return await this.prisma.productImage.update({
+      const db = this.prisma as any;
+      return await db.productImage.update({
         where: { id },
         data: updateProductImageDto,
-        include: {
-          product: true,
-        },
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -134,7 +78,8 @@ export class ProductImageService {
    */
   async remove(id: number) {
     try {
-      return await this.prisma.productImage.delete({
+      const db = this.prisma as any;
+      return await db.productImage.delete({
         where: { id },
       });
     } catch (error) {

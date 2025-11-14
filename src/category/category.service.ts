@@ -6,7 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Prisma, ProductCategory } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CategoryService {
@@ -15,9 +15,10 @@ export class CategoryService {
   /**
    * Cria uma nova categoria de produto
    */
-  async create(createCategoryDto: CreateCategoryDto): Promise<ProductCategory> {
+  async create(createCategoryDto: CreateCategoryDto): Promise<any> {
     try {
-      return await this.prisma.productCategory.create({
+      const db = this.prisma as any;
+      return await db.productCategory.create({
         data: createCategoryDto,
       });
     } catch (error) {
@@ -36,8 +37,9 @@ export class CategoryService {
   /**
    * Retorna uma lista de todas as categorias
    */
-  async findAll(): Promise<ProductCategory[]> {
-    return this.prisma.productCategory.findMany({
+  async findAll(): Promise<any[]> {
+    const db = this.prisma as any;
+    return db.productCategory.findMany({
       include: {
         products: true,
       },
@@ -47,8 +49,9 @@ export class CategoryService {
   /**
    * Busca uma categoria específica pelo ID
    */
-  async findOne(id: number): Promise<ProductCategory> {
-    const category = await this.prisma.productCategory.findUnique({
+  async findOne(id: number): Promise<any> {
+    const db = this.prisma as any;
+    const category = await db.productCategory.findUnique({
       where: { id },
       include: {
         products: true,
@@ -70,9 +73,10 @@ export class CategoryService {
   async update(
     id: number,
     updateCategoryDto: UpdateCategoryDto,
-  ): Promise<ProductCategory> {
+  ): Promise<any> {
     try {
-      return await this.prisma.productCategory.update({
+      const db = this.prisma as any;
+      return await db.productCategory.update({
         where: { id },
         data: updateCategoryDto,
         include: {
@@ -100,9 +104,10 @@ export class CategoryService {
   /**
    * Remove uma categoria de produto
    */
-  async remove(id: number): Promise<ProductCategory> {
+  async remove(id: number): Promise<any> {
     try {
-      return await this.prisma.productCategory.delete({
+      const db = this.prisma as any;
+      return await db.productCategory.delete({
         where: { id },
       });
     } catch (error) {

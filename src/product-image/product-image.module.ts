@@ -4,9 +4,9 @@ import { ProductImageController } from './product-image.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-  imports: [PrismaModule],
-  controllers: [ProductImageController],
-  providers: [ProductImageService],
-  exports: [ProductImageService],
+	imports: [PrismaModule],
+	controllers: [ProductImageController],
+	providers: [ProductImageService],
+	exports: [ProductImageService],
 })
 export class ProductImageModule {}

@@ -44,14 +44,6 @@ export class ProductImageController {
   }
 
   /**
-   * Busca todas as imagens de um produto específico
-   */
-  @Get('product/:productId')
-  findByProduct(@Param('productId', ParseIntPipe) productId: number) {
-    return this.productImageService.findByProduct(productId);
-  }
-
-  /**
    * Atualiza uma imagem de produto
    */
   @Patch(':id')
