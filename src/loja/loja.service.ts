@@ -11,7 +11,7 @@ export class LojaService {
     return this.prisma.store.create({
       data: {
         ...createLojaDto,
-        usuario_id: userId,
+        usuarioId: userId,
       },
     });
   }

@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { LojaModule } from './loja/loja.module';
 import { CommentsModule } from './comments/comments.module';
+import { StoreReviewsModule } from './store-reviews/store-reviews.module';
+import { ProductReviewsModule } from './product-reviews/product-reviews.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { CommentsModule } from './comments/comments.module';
     AuthModule,
     LojaModule,
     CommentsModule,
+    StoreReviewsModule,
+    ProductReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
