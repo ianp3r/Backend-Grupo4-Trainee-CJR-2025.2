@@ -18,8 +18,8 @@ const userSelectSafeData: Prisma.UserSelect = {
   nome: true,
   email: true,
   foto_perfil_url: true,
-  created_at: true,
-  updated_at: true,
+  createdAt: true,
+  updatedAt: true,
 };
 
 // Este DTO agora é "interno", usado pelo AuthService
