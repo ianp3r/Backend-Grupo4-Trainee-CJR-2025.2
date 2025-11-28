@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { CategoryModule } from './category/category.module';
 import { ProductImageModule } from './product-image/product-image.module';
+import { ProductModule } from './product/product.module';
 import { LojaModule } from './loja/loja.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { LojaModule } from './loja/loja.module';
     AuthModule,
     CategoryModule,
     ProductImageModule,
+    ProductModule,
     LojaModule,
   ],
   controllers: [AppController],

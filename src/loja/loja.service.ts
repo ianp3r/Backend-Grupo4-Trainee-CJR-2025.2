@@ -11,13 +11,27 @@ export class LojaService {
     return this.prisma.store.create({
       data: {
         ...createLojaDto,
-        usuario_id: userId,
+        usuarioId: userId,
       },
     });
   }
 
   findAll() {
     return this.prisma.store.findMany();
+  }
+
+  findByUserId(userId: number) {
+    return this.prisma.store.findMany({
+      where: { usuarioId: userId },
+      include: {
+        produtos: {
+          include: {
+            imagens: true,
+            categoria: true,
+          },
+        },
+      },
+    });
   }
 
   findOne(id: number) {

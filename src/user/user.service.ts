@@ -18,8 +18,8 @@ const userSelectSafeData: Prisma.UserSelect = {
   nome: true,
   email: true,
   foto_perfil_url: true,
-  created_at: true,
-  updated_at: true,
+  createdAt: true,
+  updatedAt: true,
 };
 
 // Este DTO agora é "interno", usado pelo AuthService
@@ -78,6 +78,34 @@ export class UserService {
     const user = await this.prisma.user.findUnique({
       where: { id },
       select: userSelectSafeData,
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+    }
+
+    return user;
+  }
+
+  /**
+   * Busca um usuário específico pelo ID com suas lojas e produtos.
+   */
+  async findOneWithStores(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        ...userSelectSafeData,
+        lojas: {
+          include: {
+            produtos: {
+              include: {
+                imagens: true,
+                categoria: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!user) {
