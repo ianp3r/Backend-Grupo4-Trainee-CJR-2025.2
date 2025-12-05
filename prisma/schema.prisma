@@ -80,18 +80,6 @@ model Category {
   @@map("categorias")
 }
 
-model ProductImage {
-  id         Int    @id @default(autoincrement())
-  produtoId  Int    @map("produto_id")
-  url_imagem String
-  ordem      Int?
-
-  // Relações
-  produto Product @relation(fields: [produtoId], references: [id])
-
-  @@map("imagens_produto")
-}
-
 // --- Tabelas de Avaliação ---
 
 model StoreReview {
