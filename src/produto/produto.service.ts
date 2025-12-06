@@ -6,7 +6,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ProdutoService {
   constructor(private prisma: PrismaService) {}
   async create(data: ProdutoDto) {
-    const produto = await this.prisma.produto.create({ data });
+    const { id, ...createData } = data;
+    const produto = await this.prisma.produto.create({ data: createData });
 
     return produto;
   }
@@ -24,8 +25,9 @@ export class ProdutoService {
       throw new Error('Produto não encontrado');
     }
 
+    const { id: _, ...updateData } = data;
     return await this.prisma.produto.update({
-      data,
+      data: updateData,
       where: { id },
     });
   }
