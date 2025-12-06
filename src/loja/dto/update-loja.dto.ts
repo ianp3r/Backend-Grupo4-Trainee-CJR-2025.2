@@ -5,4 +5,4 @@ import { CreateLojaDto } from './create-loja.dto';
 
 // 'PartialType' pega todos os campos do CreateLojaDto
 // e os torna opcionais. Perfeito para o update!
-export class UpdateLojaDto extends PartialType(CreateLojaDto) {}
+export class UpdateLojaDto extends PartialType(CreateLojaDto) { }

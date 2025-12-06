@@ -5,10 +5,16 @@ import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
+import { ProdutoService } from './produto/produto.service';
+import { ProdutoModule } from './produto/produto.module';
 import { CategoryModule } from './category/category.module';
 import { ProductImageModule } from './product-image/product-image.module';
 import { ProductModule } from './product/product.module';
 import { LojaModule } from './loja/loja.module';
+import { CommentsModule } from './comments/comments.module';
+import { StoreReviewsModule } from './store-reviews/store-reviews.module';
+import { ProductReviewsModule } from './product-reviews/product-reviews.module';
+
 
 @Module({
   imports: [
@@ -18,12 +24,16 @@ import { LojaModule } from './loja/loja.module';
     PrismaModule,
     UserModule,
     AuthModule,
+    ProdutoModule,
     CategoryModule,
     ProductImageModule,
     ProductModule,
     LojaModule,
+    CommentsModule,
+    StoreReviewsModule,
+    ProductReviewsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ProdutoService],
 })
 export class AppModule { }
