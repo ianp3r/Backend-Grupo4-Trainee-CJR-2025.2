@@ -19,8 +19,8 @@ const productInclude = {
   imagens: {
     select: {
       id: true,
-      url_imagem: true,
-      ordem: true,
+      url: true,
+      alt_text: true,
     },
   },
 };
@@ -33,7 +33,7 @@ export class ProductService {
    * Cria um novo produto
    */
   async create(createProductDto: CreateProductDto) {
-    return await this.prisma.product.create({
+    return await this.prisma.produto.create({
       data: createProductDto,
       include: {
         loja: {
@@ -51,8 +51,8 @@ export class ProductService {
         imagens: {
           select: {
             id: true,
-            url_imagem: true,
-            ordem: true,
+            url: true,
+            alt_text: true,
           },
         },
       },
@@ -63,7 +63,7 @@ export class ProductService {
    * Busca todos os produtos
    */
   async findAll() {
-    return await this.prisma.product.findMany({
+    return await this.prisma.produto.findMany({
       include: {
         loja: {
           select: {
@@ -80,8 +80,8 @@ export class ProductService {
         imagens: {
           select: {
             id: true,
-            url_imagem: true,
-            ordem: true,
+            url: true,
+            alt_text: true,
           },
         },
       },
@@ -92,7 +92,7 @@ export class ProductService {
    * Busca produtos por categoria
    */
   async findByCategory(categoriaId: number) {
-    return await this.prisma.product.findMany({
+    return await this.prisma.produto.findMany({
       where: {
         categoriaId: categoriaId,
       },
@@ -112,8 +112,8 @@ export class ProductService {
         imagens: {
           select: {
             id: true,
-            url_imagem: true,
-            ordem: true,
+            url: true,
+            alt_text: true,
           },
         },
       },
@@ -124,7 +124,7 @@ export class ProductService {
    * Busca produtos por loja
    */
   async findByStore(lojaId: number) {
-    return await this.prisma.product.findMany({
+    return await this.prisma.produto.findMany({
       where: {
         lojaId: lojaId,
       },
@@ -144,8 +144,8 @@ export class ProductService {
         imagens: {
           select: {
             id: true,
-            url_imagem: true,
-            ordem: true,
+            url: true,
+            alt_text: true,
           },
         },
       },
@@ -156,7 +156,7 @@ export class ProductService {
    * Busca um produto pelo ID
    */
   async findOne(id: number) {
-    const product = await this.prisma.product.findUnique({
+    const product = await this.prisma.produto.findUnique({
       where: { id },
       include: {
         loja: {
@@ -174,8 +174,8 @@ export class ProductService {
         imagens: {
           select: {
             id: true,
-            url_imagem: true,
-            ordem: true,
+            url: true,
+            alt_text: true,
           },
         },
       },
@@ -194,7 +194,7 @@ export class ProductService {
   async update(id: number, updateProductDto: UpdateProductDto) {
     await this.findOne(id); // Verifica se existe
 
-    return await this.prisma.product.update({
+    return await this.prisma.produto.update({
       where: { id },
       data: updateProductDto,
       include: {
@@ -213,8 +213,8 @@ export class ProductService {
         imagens: {
           select: {
             id: true,
-            url_imagem: true,
-            ordem: true,
+            url: true,
+            alt_text: true,
           },
         },
       },
@@ -227,7 +227,7 @@ export class ProductService {
   async remove(id: number) {
     await this.findOne(id); // Verifica se existe
 
-    return await this.prisma.product.delete({
+    return await this.prisma.produto.delete({
       where: { id },
     });
   }
