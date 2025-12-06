@@ -41,30 +41,10 @@ model Store {
 
   // Relações
   usuario    User          @relation(fields: [usuarioId], references: [id])
-  produtos   Product[]
+  produtos   Produto[]
   avaliacoes StoreReview[]
 
   @@map("lojas")
-}
-
-model Product {
-  id          Int      @id @default(autoincrement())
-  lojaId      Int      @map("loja_id")
-  categoriaId Int      @map("categoria_id")
-  nome        String
-  descricao   String?
-  preco       Int // Armazenar como centavos (Integer)
-  estoque     Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relações
-  loja       Store           @relation(fields: [lojaId], references: [id])
-  categoria  Category        @relation(fields: [categoriaId], references: [id])
-  imagens    ProductImage[]
-  avaliacoes ProductReview[]
-
-  @@map("produtos")
 }
 
 model Category {
@@ -75,7 +55,7 @@ model Category {
   // Relações
   parent   Category?  @relation("SubCategories", fields: [categoriaPaiId], references: [id])
   children Category[] @relation("SubCategories")
-  produtos Product[]
+  produtos Produto[]
 
   @@map("categorias")
 }
@@ -110,7 +90,7 @@ model ProductReview {
 
   // Relações
   usuario     User            @relation(fields: [usuarioId], references: [id])
-  produto     Product         @relation(fields: [produtoId], references: [id])
+  produto     Produto         @relation(fields: [produtoId], references: [id])
   comentarios ReviewComment[]
 
   @@map("avaliacoes_produto")
@@ -135,35 +115,44 @@ model ReviewComment {
 
 // Modelo de Categoria de Produto
 model ProductCategory {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  slug        String    @unique
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
   description String?
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 }
 
 // Modelo de Imagem de Produto
-// Referencia um Product que será criado por outro membro do time
+// Referencia um Produto que será criado por outro membro do time
 model ProductImage {
-  id        Int      @id @default(autoincrement())
-  productId Int
-  url       String
-  alt_text  String?
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  url        String
+  alt_text   String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  produto    Produto  @relation(fields: [productId], references: [id])
 
   @@index([productId])
 }
 
 model Produto {
   id          Int       @id @default(autoincrement())
+  lojaId      Int       @map("loja_id")
+  categoriaId Int?      @map("categoria_id")
   nome        String    
   descricao   String?   
   preco       Decimal   
   estoque     Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  // Relações
+  loja       Store           @relation(fields: [lojaId], references: [id])
+  categoria  Category?       @relation(fields: [categoriaId], references: [id])
+  imagens    ProductImage[]
+  avaliacoes ProductReview[]
 
   @@map("produtos")
 }

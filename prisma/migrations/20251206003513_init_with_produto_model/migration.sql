@@ -1,20 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropIndex
-DROP INDEX "User_email_key";
-
--- DropIndex
-DROP INDEX "User_username_key";
-
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "User";
-PRAGMA foreign_keys=on;
-
 -- CreateTable
 CREATE TABLE "usuarios" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -28,18 +11,17 @@ CREATE TABLE "usuarios" (
 );
 
 -- CreateTable
-CREATE TABLE "produtos" (
+CREATE TABLE "lojas" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "loja_id" INTEGER NOT NULL,
-    "categoria_id" INTEGER NOT NULL,
+    "usuario_id" INTEGER NOT NULL,
     "nome" TEXT NOT NULL,
     "descricao" TEXT,
-    "preco" INTEGER NOT NULL,
-    "estoque" INTEGER NOT NULL,
+    "logo_url" TEXT,
+    "banner_url" TEXT,
+    "sticker_url" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "produtos_loja_id_fkey" FOREIGN KEY ("loja_id") REFERENCES "lojas" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "produtos_categoria_id_fkey" FOREIGN KEY ("categoria_id") REFERENCES "categorias" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "lojas_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuarios" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -48,15 +30,6 @@ CREATE TABLE "categorias" (
     "nome" TEXT NOT NULL,
     "categoria_pai_id" INTEGER,
     CONSTRAINT "categorias_categoria_pai_id_fkey" FOREIGN KEY ("categoria_pai_id") REFERENCES "categorias" ("id") ON DELETE SET NULL ON UPDATE CASCADE
-);
-
--- CreateTable
-CREATE TABLE "imagens_produto" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "produto_id" INTEGER NOT NULL,
-    "url_imagem" TEXT NOT NULL,
-    "ordem" INTEGER,
-    CONSTRAINT "imagens_produto_produto_id_fkey" FOREIGN KEY ("produto_id") REFERENCES "produtos" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -99,29 +72,53 @@ CREATE TABLE "comentarios_avaliacao" (
     CONSTRAINT "comentarios_avaliacao_avaliacao_produto_id_fkey" FOREIGN KEY ("avaliacao_produto_id") REFERENCES "avaliacoes_produto" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- RedefineTables
-PRAGMA defer_foreign_keys=ON;
-PRAGMA foreign_keys=OFF;
-CREATE TABLE "new_lojas" (
+-- CreateTable
+CREATE TABLE "ProductCategory" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "usuario_id" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "description" TEXT,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "ProductImage" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "productId" INTEGER NOT NULL,
+    "url" TEXT NOT NULL,
+    "alt_text" TEXT,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL,
+    CONSTRAINT "ProductImage_productId_fkey" FOREIGN KEY ("productId") REFERENCES "produtos" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "produtos" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "loja_id" INTEGER NOT NULL,
+    "categoria_id" INTEGER,
     "nome" TEXT NOT NULL,
     "descricao" TEXT,
-    "logo_url" TEXT,
-    "banner_url" TEXT,
-    "sticker_url" TEXT,
+    "preco" DECIMAL NOT NULL,
+    "estoque" INTEGER NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "lojas_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuarios" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "produtos_loja_id_fkey" FOREIGN KEY ("loja_id") REFERENCES "lojas" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "produtos_categoria_id_fkey" FOREIGN KEY ("categoria_id") REFERENCES "categorias" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
-INSERT INTO "new_lojas" ("banner_url", "createdAt", "descricao", "id", "logo_url", "nome", "sticker_url", "updatedAt", "usuario_id") SELECT "banner_url", "createdAt", "descricao", "id", "logo_url", "nome", "sticker_url", "updatedAt", "usuario_id" FROM "lojas";
-DROP TABLE "lojas";
-ALTER TABLE "new_lojas" RENAME TO "lojas";
-PRAGMA foreign_keys=ON;
-PRAGMA defer_foreign_keys=OFF;
 
 -- CreateIndex
 CREATE UNIQUE INDEX "usuarios_username_key" ON "usuarios"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "usuarios_email_key" ON "usuarios"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ProductCategory_name_key" ON "ProductCategory"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ProductCategory_slug_key" ON "ProductCategory"("slug");
+
+-- CreateIndex
+CREATE INDEX "ProductImage_productId_idx" ON "ProductImage"("productId");
