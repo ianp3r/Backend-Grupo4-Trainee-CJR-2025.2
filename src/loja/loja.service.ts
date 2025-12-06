@@ -20,6 +20,20 @@ export class LojaService {
     return this.prisma.store.findMany();
   }
 
+  findByUserId(userId: number) {
+    return this.prisma.store.findMany({
+      where: { usuarioId: userId },
+      include: {
+        produtos: {
+          include: {
+            imagens: true,
+            categoria: true,
+          },
+        },
+      },
+    });
+  }
+
   findOne(id: number) {
     return this.prisma.store.findUnique({
       where: { id: +id },

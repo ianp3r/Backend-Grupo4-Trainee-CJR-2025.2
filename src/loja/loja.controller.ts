@@ -16,14 +16,19 @@ export class LojaController {
   constructor(private readonly lojaService: LojaService) {}
 
   @Post()
-  create(@Body() createLojaDto: CreateLojaDto) {
-    const mockUserId = 1;
-    return this.lojaService.create(createLojaDto, mockUserId);
+  create(@Body() createLojaDto: CreateLojaDto & { usuarioId: number }) {
+    const { usuarioId, ...lojaData } = createLojaDto;
+    return this.lojaService.create(lojaData, usuarioId);
   }
 
   @Get()
   findAll() {
     return this.lojaService.findAll();
+  }
+
+  @Get('user/:userId')
+  findByUserId(@Param('userId') userId: string) {
+    return this.lojaService.findByUserId(+userId);
   }
 
   @Get(':id')

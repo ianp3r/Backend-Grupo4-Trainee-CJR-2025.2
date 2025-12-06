@@ -88,6 +88,34 @@ export class UserService {
   }
 
   /**
+   * Busca um usuário específico pelo ID com suas lojas e produtos.
+   */
+  async findOneWithStores(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        ...userSelectSafeData,
+        lojas: {
+          include: {
+            produtos: {
+              include: {
+                imagens: true,
+                categoria: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Usuário com ID ${id} não encontrado.`);
+    }
+
+    return user;
+  }
+
+  /**
    * Atualiza um usuário.
    * Este método AINDA faz hash, pois um usuário pode
    * atualizar sua própria senha.
