@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite" // Provedor é SQLite
-  url      = env("DATABASE_URL") // Lê a string de conexão do arquivo .env
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
-// Schema de usuário inicial sem conexão com outras tabelas (Lojas, reviews...)
-// pois ainda não foram criadas.
+// --- Tabelas Principais ---
+
 model User {
   id              Int      @id @default(autoincrement())
   username        String   @unique
@@ -16,8 +16,144 @@ model User {
   email           String   @unique
   senha_hash      String
   foto_perfil_url String?
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relações
+  lojas                 Store[]
+  avaliacoes_loja       StoreReview[]
+  avaliacoes_produto    ProductReview[]
+  comentarios_avaliacao ReviewComment[]
+
+  @@map("usuarios")
+}
+
+model Store {
+  id          Int      @id @default(autoincrement())
+  usuarioId   Int      @map("usuario_id")
+  nome        String
+  descricao   String? // Mapeia para TEXT
+  logo_url    String?
+  banner_url  String?
+  sticker_url String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relações
+  usuario    User          @relation(fields: [usuarioId], references: [id])
+  produtos   Product[]
+  avaliacoes StoreReview[]
+
+  @@map("lojas")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  lojaId      Int      @map("loja_id")
+  categoriaId Int      @map("categoria_id")
+  nome        String
+  descricao   String?
+  preco       Int // Armazenar como centavos (Integer)
+  estoque     Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relações
+  loja       Store           @relation(fields: [lojaId], references: [id])
+  categoria  Category        @relation(fields: [categoriaId], references: [id])
+  imagens    ProductImage[]
+  avaliacoes ProductReview[]
+
+  @@map("produtos")
+}
+
+model Category {
+  id             Int    @id @default(autoincrement())
+  nome           String
+  categoriaPaiId Int?   @map("categoria_pai_id")
+
+  // Relações
+  parent   Category?  @relation("SubCategories", fields: [categoriaPaiId], references: [id])
+  children Category[] @relation("SubCategories")
+  produtos Product[]
+
+  @@map("categorias")
+}
+
+// --- Tabelas de Avaliação ---
+
+model StoreReview {
+  id         Int      @id @default(autoincrement())
+  usuarioId  Int      @map("usuario_id")
+  lojaId     Int      @map("loja_id")
+  nota       Int
+  comentario String? // Mapeia para TEXT
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relações
+  usuario     User            @relation(fields: [usuarioId], references: [id])
+  loja        Store           @relation(fields: [lojaId], references: [id])
+  comentarios ReviewComment[]
+
+  @@map("avaliacoes_loja")
+}
+
+model ProductReview {
+  id         Int      @id @default(autoincrement())
+  usuarioId  Int      @map("usuario_id")
+  produtoId  Int      @map("produto_id")
+  nota       Int
+  comentario String? // Mapeia para TEXT
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relações
+  usuario     User            @relation(fields: [usuarioId], references: [id])
+  produto     Product         @relation(fields: [produtoId], references: [id])
+  comentarios ReviewComment[]
+
+  @@map("avaliacoes_produto")
+}
+
+model ReviewComment {
+  id                 Int      @id @default(autoincrement())
+  usuarioId          Int      @map("usuario_id")
+  avaliacaoId        Int?     @map("avaliacao_id")
+  avaliacaoProdutoId Int?     @map("avaliacao_produto_id")
+  conteudo           String? // Mapeia para TEXT
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relações
+  usuario           User           @relation(fields: [usuarioId], references: [id])
+  avaliacao_loja    StoreReview?   @relation(fields: [avaliacaoId], references: [id])
+  avaliacao_produto ProductReview? @relation(fields: [avaliacaoProdutoId], references: [id])
+
+  @@map("comentarios_avaliacao")
+}
+
+// Modelo de Categoria de Produto
+model ProductCategory {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+}
+
+// Modelo de Imagem de Produto
+// Referencia um Product que será criado por outro membro do time
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  url       String
+  alt_text  String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([productId])
 }
 
 model Produto {
