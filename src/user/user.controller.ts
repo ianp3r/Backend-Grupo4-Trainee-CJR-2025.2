@@ -16,7 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @Controller('users')
 @UseGuards(JwtAuthGuard) // <-- PROTEGE TODOS OS ENDPOINTS DO CONTROLLER
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   //
   // O ENDPOINT POST /users/login FOI REMOVIDO DAQUI

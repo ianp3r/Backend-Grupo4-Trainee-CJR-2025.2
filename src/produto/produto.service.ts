@@ -6,7 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ProdutoService {
   constructor(private prisma: PrismaService) {}
   async create(data: ProdutoDto) {
-    const { id, ...createData } = data;
+    const { id, categoriaId, createdAt, updatedAt, ...createData } = data;
     
     // Validate that the store exists
     const storeExists = await this.prisma.store.findUnique({
@@ -18,27 +18,35 @@ export class ProdutoService {
     }
 
     // Validate that the category exists if provided
-    if (createData.categoriaId) {
+    if (categoriaId) {
       const categoryExists = await this.prisma.category.findUnique({
-        where: { id: createData.categoriaId },
+        where: { id: categoriaId },
       });
 
       if (!categoryExists) {
-        throw new Error(`Categoria com ID ${createData.categoriaId} não encontrada`);
+        throw new Error(`Categoria com ID ${categoriaId} não encontrada`);
       }
     }
 
-    const produto = await this.prisma.produto.create({ data: createData });
+    // Build the data object, only including categoriaId if it's provided
+    const dataToCreate: any = createData;
+    if (categoriaId) {
+      dataToCreate.categoriaId = categoriaId;
+    }
+
+    const produto = await this.prisma.product.create({ 
+      data: dataToCreate
+    });
 
     return produto;
   }
 
   async findAll() {
-    return await this.prisma.produto.findMany();
+    return await this.prisma.product.findMany();
   }
 
   async update(id: number, data: ProdutoDto) {
-    const produtoExists = await this.prisma.produto.findUnique({
+    const produtoExists = await this.prisma.product.findUnique({
       where: { id },
     });
 
@@ -47,14 +55,14 @@ export class ProdutoService {
     }
 
     const { id: _, ...updateData } = data;
-    return await this.prisma.produto.update({
+    return await this.prisma.product.update({
       data: updateData,
       where: { id },
     });
   }
 
   async delete(id: number) {
-    const produtoExists = await this.prisma.produto.findUnique({
+    const produtoExists = await this.prisma.product.findUnique({
       where: { id },
     });
 
@@ -62,11 +70,11 @@ export class ProdutoService {
       throw new Error('Produto não encontrado');
     }
 
-    return await this.prisma.produto.delete({ where: { id } });
+    return await this.prisma.product.delete({ where: { id } });
   }
 
   async getById(id: number) {
-    const produtoExists = await this.prisma.produto.findUnique({
+    const produtoExists = await this.prisma.product.findUnique({
       where: { id },
     });
 

@@ -24,7 +24,10 @@ export class ProductController {
   }
 
   @Get()
-  findAll(@Query('categoria') categoriaId?: string, @Query('loja') lojaId?: string) {
+  findAll(
+    @Query('categoria') categoriaId?: string,
+    @Query('loja') lojaId?: string,
+  ) {
     if (categoriaId) {
       return this.productService.findByCategory(parseInt(categoriaId));
     }
