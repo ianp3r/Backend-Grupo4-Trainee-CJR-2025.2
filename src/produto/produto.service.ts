@@ -7,6 +7,27 @@ export class ProdutoService {
   constructor(private prisma: PrismaService) {}
   async create(data: ProdutoDto) {
     const { id, ...createData } = data;
+    
+    // Validate that the store exists
+    const storeExists = await this.prisma.store.findUnique({
+      where: { id: createData.lojaId },
+    });
+
+    if (!storeExists) {
+      throw new Error(`Loja com ID ${createData.lojaId} não encontrada`);
+    }
+
+    // Validate that the category exists if provided
+    if (createData.categoriaId) {
+      const categoryExists = await this.prisma.category.findUnique({
+        where: { id: createData.categoriaId },
+      });
+
+      if (!categoryExists) {
+        throw new Error(`Categoria com ID ${createData.categoriaId} não encontrada`);
+      }
+    }
+
     const produto = await this.prisma.produto.create({ data: createData });
 
     return produto;
