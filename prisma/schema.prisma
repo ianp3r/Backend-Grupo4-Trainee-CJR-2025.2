@@ -155,3 +155,16 @@ model ProductImage {
 
   @@index([productId])
 }
+
+model Produto {
+  id          Int       @id @default(autoincrement())
+  nome        String    
+  descricao   String?   
+  preco       Decimal   
+  estoque     Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("produtos")
+}
+
