@@ -24,6 +24,11 @@ export class ProdutoController {
     return this.produtoService.findAll();
   }
 
+  @Get('by-category')
+  async findAllByCategory() {
+    return this.produtoService.findAllByCategory();
+  }
+
   @Put(':id')
   async update(@Param('id') id: number, @Body() data: ProdutoDto) {
     return this.produtoService.update(Number(id), data);

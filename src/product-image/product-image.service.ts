@@ -93,4 +93,15 @@ export class ProductImageService {
       throw error;
     }
   }
+
+  /**
+   * Busca todas as imagens de um produto específico
+   */
+  async findByProductId(productId: number) {
+    const db = this.prisma as any;
+    return db.productImage.findMany({
+      where: { productId },
+      orderBy: { id: 'asc' },
+    });
+  }
 }
