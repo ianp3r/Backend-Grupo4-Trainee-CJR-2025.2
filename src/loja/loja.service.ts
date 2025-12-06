@@ -1,19 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateLojaDto } from './dto/create-loja.dto';
 import { UpdateLojaDto } from './dto/update-loja.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class LojaService {
   constructor(private prisma: PrismaService) {}
 
-  create(createLojaDto: CreateLojaDto, userId: number) {
-    return this.prisma.store.create({
-      data: {
-        ...createLojaDto,
-        usuarioId: userId,
-      },
-    });
+  async create(createLojaDto: CreateLojaDto, userId: number) {
+    try {
+      // Verify user exists
+      const userExists = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!userExists) {
+        throw new NotFoundException(`User with ID ${userId} not found`);
+      }
+
+      return await this.prisma.store.create({
+        data: {
+          ...createLojaDto,
+          usuarioId: userId,
+        },
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new BadRequestException(
+          'Invalid data provided for store creation',
+        );
+      }
+
+      throw error;
+    }
   }
 
   findAll() {
