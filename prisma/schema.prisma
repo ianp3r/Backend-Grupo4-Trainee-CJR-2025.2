@@ -113,16 +113,6 @@ model ReviewComment {
   @@map("comentarios_avaliacao")
 }
 
-// Modelo de Categoria de Produto
-model ProductCategory {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  slug        String   @unique
-  description String?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-}
-
 // Modelo de Imagem de Produto
 // Referencia um Produto que será criado por outro membro do time
 model ProductImage {

@@ -17,8 +17,7 @@ export class CategoryService {
    */
   async create(createCategoryDto: CreateCategoryDto): Promise<any> {
     try {
-      const db = this.prisma as any;
-      return await db.productCategory.create({
+      return await this.prisma.category.create({
         data: createCategoryDto,
       });
     } catch (error) {
@@ -38,10 +37,11 @@ export class CategoryService {
    * Retorna uma lista de todas as categorias
    */
   async findAll(): Promise<any[]> {
-    const db = this.prisma as any;
-    return db.productCategory.findMany({
+    return this.prisma.category.findMany({
       include: {
-        products: true,
+        parent: true,
+        children: true,
+        produtos: true,
       },
     });
   }
@@ -50,11 +50,12 @@ export class CategoryService {
    * Busca uma categoria específica pelo ID
    */
   async findOne(id: number): Promise<any> {
-    const db = this.prisma as any;
-    const category = await db.productCategory.findUnique({
+    const category = await this.prisma.category.findUnique({
       where: { id },
       include: {
-        products: true,
+        parent: true,
+        children: true,
+        produtos: true,
       },
     });
 
@@ -66,21 +67,19 @@ export class CategoryService {
 
     return category;
   }
-  
+
   /**
    * Atualiza uma categoria de produto
    */
-  async update(
-    id: number,
-    updateCategoryDto: UpdateCategoryDto,
-  ): Promise<any> {
+  async update(id: number, updateCategoryDto: UpdateCategoryDto): Promise<any> {
     try {
-      const db = this.prisma as any;
-      return await db.productCategory.update({
+      return await this.prisma.category.update({
         where: { id },
         data: updateCategoryDto,
         include: {
-          products: true,
+          parent: true,
+          children: true,
+          produtos: true,
         },
       });
     } catch (error) {
@@ -106,8 +105,7 @@ export class CategoryService {
    */
   async remove(id: number): Promise<any> {
     try {
-      const db = this.prisma as any;
-      return await db.productCategory.delete({
+      return await this.prisma.category.delete({
         where: { id },
       });
     } catch (error) {
