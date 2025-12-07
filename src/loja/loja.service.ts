@@ -37,6 +37,14 @@ export class LojaService {
   findOne(id: number) {
     return this.prisma.store.findUnique({
       where: { id: +id },
+      include: {
+        produtos: {
+          include: {
+            imagens: true,
+            categoria: true,
+          },
+        },
+      },
     });
   }
 

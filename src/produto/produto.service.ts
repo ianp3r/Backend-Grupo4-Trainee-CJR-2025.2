@@ -42,7 +42,13 @@ export class ProdutoService {
   }
 
   async findAll() {
-    return await this.prisma.product.findMany();
+    return await this.prisma.product.findMany({
+      include: {
+        loja: true,
+        categoria: true,
+        imagens: true,
+      },
+    });
   }
 
   async update(id: number, data: ProdutoDto) {
@@ -76,6 +82,16 @@ export class ProdutoService {
   async getById(id: number) {
     const produtoExists = await this.prisma.product.findUnique({
       where: { id },
+      include: {
+        loja: true,
+        categoria: true,
+        imagens: true,
+        avaliacoes: {
+          include: {
+            usuario: true,
+          },
+        },
+      },
     });
 
     if (!produtoExists) {
