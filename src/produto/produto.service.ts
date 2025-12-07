@@ -34,7 +34,7 @@ export class ProdutoService {
       dataToCreate.categoriaId = categoriaId;
     }
 
-    const produto = await this.prisma.product.create({ 
+    const produto = await this.prisma.produto.create({ 
       data: dataToCreate
     });
 
@@ -42,7 +42,7 @@ export class ProdutoService {
   }
 
   async findAll() {
-    return await this.prisma.product.findMany({
+    return await this.prisma.produto.findMany({
       include: {
         loja: true,
         categoria: true,
@@ -52,7 +52,7 @@ export class ProdutoService {
   }
 
   async update(id: number, data: ProdutoDto) {
-    const produtoExists = await this.prisma.product.findUnique({
+    const produtoExists = await this.prisma.produto.findUnique({
       where: { id },
     });
 
@@ -61,14 +61,14 @@ export class ProdutoService {
     }
 
     const { id: _, ...updateData } = data;
-    return await this.prisma.product.update({
+    return await this.prisma.produto.update({
       data: updateData,
       where: { id },
     });
   }
 
   async delete(id: number) {
-    const produtoExists = await this.prisma.product.findUnique({
+    const produtoExists = await this.prisma.produto.findUnique({
       where: { id },
     });
 
@@ -76,11 +76,11 @@ export class ProdutoService {
       throw new Error('Produto não encontrado');
     }
 
-    return await this.prisma.product.delete({ where: { id } });
+    return await this.prisma.produto.delete({ where: { id } });
   }
 
   async getById(id: number) {
-    const produtoExists = await this.prisma.product.findUnique({
+    const produtoExists = await this.prisma.produto.findUnique({
       where: { id },
       include: {
         loja: true,
