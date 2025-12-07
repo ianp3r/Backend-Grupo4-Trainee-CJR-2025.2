@@ -20,6 +20,7 @@ const productInclude = {
     select: {
       id: true,
       url: true,
+      alt_text: true,
     },
   },
 };
@@ -51,6 +52,7 @@ export class ProductService {
           select: {
             id: true,
             url: true,
+            alt_text: true,
           },
         },
       },
@@ -79,6 +81,7 @@ export class ProductService {
           select: {
             id: true,
             url: true,
+            alt_text: true,
           },
         },
       },
@@ -110,6 +113,7 @@ export class ProductService {
           select: {
             id: true,
             url: true,
+            alt_text: true,
           },
         },
       },
@@ -141,6 +145,7 @@ export class ProductService {
           select: {
             id: true,
             url: true,
+            alt_text: true,
           },
         },
       },
@@ -170,6 +175,7 @@ export class ProductService {
           select: {
             id: true,
             url: true,
+            alt_text: true,
           },
         },
       },
@@ -208,6 +214,7 @@ export class ProductService {
           select: {
             id: true,
             url: true,
+            alt_text: true,
           },
         },
       },

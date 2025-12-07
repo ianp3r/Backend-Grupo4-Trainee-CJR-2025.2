@@ -63,4 +63,12 @@ export class ProductImageController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productImageService.remove(id);
   }
+
+  /**
+   * Busca todas as imagens de um produto pelo ID do produto
+   */
+  @Get('product/:productId')
+  findByProductId(@Param('productId', ParseIntPipe) productId: number) {
+    return this.productImageService.findByProductId(productId);
+  }
 }
